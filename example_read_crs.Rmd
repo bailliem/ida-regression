@@ -1,0 +1,43 @@
+---
+title: "Example notebook to read the CRS dataset"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+
+```{r setupR}
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(Hmisc)
+library(here)
+
+## Relative path to the data set
+crs_data_path = here("data", "crs.csv")
+```
+
+
+Load the CRS dataset.
+
+```{r}
+crs_data = read_csv(crs_data_path)
+```
+
+Examine the the contents of the data set.
+
+```{r}
+Hmisc::describe(crs_data) 
+```
+
+## Session info
+
+Print out the session info. 
+```{r}
+sessionInfo()
+```
