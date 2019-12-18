@@ -16,6 +16,7 @@ library(ggplot2)
 library(dplyr)
 library(readr)
 library(Hmisc)
+library(skimr)
 library(here)
 
 ## Relative path to the data set
@@ -29,11 +30,72 @@ Load the CRS dataset.
 crs_data = read_csv(crs_data_path)
 ```
 
+```{r}
+crs_data %>% glimpse()
+```
+
+
+
+
+```{r}
+crs_data %>% 
+  ggplot(aes(x = t2comp_pre, y = bmi)) + 
+  geom_point()
+```
+
+
 Examine the the contents of the data set.
 
 ```{r}
 Hmisc::describe(crs_data) 
 ```
+
+```{r}
+sum <- Hmisc::describe(crs_data) 
+sum %>% glimpse()
+```
+
+
+
+```{r}
+skim(crs_data)
+```
+
+```{r}
+skim(crs_data) 
+```
+
+
+```{r}
+set.seed(22)
+data <- data.frame(age = floor(rnorm(6,25,10)), 
+                   sex = gl(2,1,6, labels = c("f","m")))
+var.labels <- c(age = "Age in Years", 
+                sex = "Sex of the participant")
+dplyr::as.tbl(data) # as tibble ---------------------------------------------
+#> # A tibble: 6 × 2
+#>     age    sex
+#>   <dbl> <fctr>
+#> 1    19      f
+#> 2    49      m
+#> 3    35      f
+#> 4    27      m
+#> 5    22      f
+#> 6    43      m
+data <- Hmisc::upData(data, labels = var.labels) # update data --------------
+#> Input object size:    1328 bytes;     2 variables     6 observations
+#> New object size: 2096 bytes; 2 variables 6 observations
+Hmisc::label(data) # check new labels ---------------------------------------
+#>                      age                      sex 
+#>           "Age in Years" "Sex of the participant"
+Hmisc::contents(data) # data dictionary -------------------------------------
+```
+
+
+```{r}
+skim(crs_data)
+```
+
 
 ## Session info
 
