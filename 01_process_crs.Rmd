@@ -12,13 +12,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Set up
+# Read data
 
 Assumptions: 
 
 * Basic reporting
-* Code is simple, readable. 
-* Less emphasis on modularity (i.e. functions) to aim at level 1 and 2
+* To aim at level 1 and 2, less emphasis on code modularity (i.e. user defined functions) 
+* Code to be simple, readable, extendable. 
+
 
 
 TODO: add variable to indicate measurement type:
@@ -27,6 +28,8 @@ TODO: add variable to indicate measurement type:
 * outcome
 Add additional metadata on measurement timing
 
+## Set up
+
 Set up packages and path to the data set. 
 
 ```{r setupR}
@@ -34,8 +37,13 @@ library(rmarkdown)
 library(ggplot2)
 library(dplyr)
 library(Hmisc)
-library(here)
+library(forcats)
 library(patchwork)
+library(here)
+
+
+## Set global ggplot theme
+theme_set(theme_light())
 
 ## Relative path to the data set
 crs_data_path = here("data", "crs.Rdata")
@@ -50,9 +58,65 @@ load(crs_data_path)
 ```
 
 
+## Check data
+
+Check data contents and complete any misssing information including labels or units. 
+
+display the data set contents. 
+
+```{r}
+Hmisc::contents(crs) 
+```
+
+
+Add missing label for BMI. 
+
+```{r}
+crs <- crs %>%
+  Hmisc::upData(labels = c(bmi = 'body mass index'))
+```
+
+```{r}
+crs %>% describe()
+```
+
+
+
+
 # Univariate data display
 
 ## Medical history
+
+A summary of medical history measured at *diagnosis* (TODO: check when medical history / commorbidities was assessed). 
+
+### Congestive heart failure
+
+```{r}
+crs %>% 
+  select(chf) %>%
+  Hmisc::describe()
+```
+
+```{r}
+gg_chf <- 
+  crs %>%
+  select(chf) %>%
+  mutate(chf = fct_recode(chf,
+                          "no" = "1",
+                          "yes"   = "0")) %>%
+  ggplot(aes(chf)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of patients with congestive heart failure reported at diagnosis") +
+  ylab("Number of patients") +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+
 
 ## Patient characteristics 
 
@@ -66,7 +130,7 @@ gg1 <- crs %>%
 
 
 ```{r}
-gg1 + gg1 + gg1 
+gg1 + gg1 + gg1 + gg_chf
 ```
 
 
