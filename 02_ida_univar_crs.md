@@ -82,19 +82,19 @@ Medical history
 
 A summary of medical history measured at *diagnosis* (TODO: check when
 medical history / comorbidities were assessed): \* AFib, \* MI \* CHF \*
-Diabetes
+Diabetes \* Crohn’s disease
 
 Print out descriptive summary.
 
 ``` r
 crs %>% 
-  select(chf, afib, mi, diabetes) %>%
+  select(chf, afib, mi, diabetes, crohn, ulcercol, ibd) %>%
   Hmisc::describe()
 ```
 
     ## . 
     ## 
-    ##  4  Variables      345  Observations
+    ##  7  Variables      345  Observations
     ## --------------------------------------------------------------------------------
     ## chf : congesitive heart failure 
     ##        n  missing distinct 
@@ -128,6 +128,30 @@ crs %>%
     ## Frequency    303    42
     ## Proportion 0.878 0.122
     ## --------------------------------------------------------------------------------
+    ## crohn : Crohn's disease 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    343     2
+    ## Proportion 0.994 0.006
+    ## --------------------------------------------------------------------------------
+    ## ulcercol : ulceratie colitis 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    337     8
+    ## Proportion 0.977 0.023
+    ## --------------------------------------------------------------------------------
+    ## ibd : inflammatory bowel disease 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    335    10
+    ## Proportion 0.971 0.029
+    ## --------------------------------------------------------------------------------
 
 Plot of the distribution of patients with specific comorbidities
 measured at diagnosis.
@@ -138,7 +162,7 @@ by comorbidity
 
 ``` r
 crs %>%
-  select(id, chf, afib, diabetes, mi, copd) %>%
+  select(id, chf, afib, diabetes, mi, copd, crohn, ulcercol, ibd) %>%
   pivot_longer(-id, names_to = "comorb", values_to = "value") %>%
   mutate(
     comorb = case_when(
@@ -146,50 +170,10 @@ crs %>%
       comorb == "afib" ~ "Atrial fibrillation",
       comorb == "diabetes" ~ "Diabetes",
       comorb == "copd" ~ "COPD",
-      comorb == "mi" ~ "Myocardial infarction"
-    ),
-    value = case_when(value == "0" ~ "no",
-                      value == "1" ~ "yes")
-  ) %>%
-  group_by(comorb, value) %>%
-  summarise(n = n()) %>%
-  mutate(
-    inc = n / bigN,
-    perc = n / bigN * 100,
-    plot_lab = paste0('(', n, ', ', round(perc, digits = 1), '%)')
-  ) %>%
-  ggplot(aes(value, n)) +
-  geom_col(width = 0.6,
-           alpha = 0.15,
-           fill = "red") +
-  geom_text(aes(y = n, label = plot_lab), size = 3.5, nudge_y = 20) +
-  scale_y_continuous(limits = c(0, 400)) +
-  coord_flip() +
-  facet_wrap( ~ comorb, ncol = 2) +
-  ggtitle("Number (and percentage) of patients\n reporting comorbidity at diagnosis") +
-  ylab("Number of patients") +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.y = element_blank(),
-    axis.title.y = element_blank()
-  )
-```
-
-![](02_ida_univar_crs_files/figure-markdown_github/unnamed-chunk-4-1.png)
-
-Alternative way to plot information.
-
-``` r
-crs %>%
-  select(id, chf, afib, diabetes, mi, copd) %>%
-  pivot_longer(-id, names_to = "comorb", values_to = "value") %>%
-  mutate(
-    comorb = case_when(
-      comorb == "chf" ~ "Congestive heart failure",
-      comorb == "afib" ~ "Atrial fibrillation",
-      comorb == "diabetes" ~ "Diabetes",
-      comorb == "copd" ~ "COPD",
-      comorb == "mi" ~ "Myocardial infarction"
+      comorb == "mi" ~ "Myocardial infarction",
+      comorb == "crohn" ~ "Crohn's disease",
+      comorb == "ulcercol" ~ "Ulcerative colitis",
+      comorb == "ibd" ~ "Inflammatory bowel disease"
     ),
     value = case_when(value == "0" ~ "no",
                       value == "1" ~ "yes")
@@ -200,15 +184,15 @@ crs %>%
     inc = n / bigN,
     perc = n / bigN * 100,
     plot_lab = paste0('(', n, ', ', round(perc, digits = 1), '%)'),
-    axis_lab = paste0(value, ' ','(', n, ', ', round(perc, digits = 1), '%)')
+    axis_lab = paste0(value, ' ', '(', n, ', ', round(perc, digits = 1), '%)')
   ) %>%
   ggplot(aes(axis_lab, n)) +
   geom_col(width = 0.6,
            alpha = 0.15,
-           fill = "red") +
+           fill = "black") +
   coord_flip() +
-  facet_wrap( ~ comorb, ncol = 3, scales = "free_y") +
-    ggtitle("Number and percentage of patients reporting\n a comorbidity at diagnosis") +
+  facet_wrap(~ comorb, ncol = 2, scales = "free_y") +
+  ggtitle("Number and percentage of patients reporting\n a comorbidity at diagnosis") +
   theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
@@ -217,7 +201,7 @@ crs %>%
   )
 ```
 
-![](02_ida_univar_crs_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](02_ida_univar_crs_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 Patient characteristics
 -----------------------
