@@ -104,34 +104,43 @@ Process steps:
 * Plot counts by comorbidity 
 
 ```{r}
+bigN <- nrow(crs)
 crs %>%
-  select(id, chf, afib, diabetes, mi) %>%
+  select(id, chf, afib, diabetes, mi, copd) %>%
   pivot_longer(-id, names_to = "comorb", values_to = "value") %>%
   mutate(
     comorb = case_when(
       comorb == "chf" ~ "Congestive heart failure",
       comorb == "afib" ~ "Atrial fibrillation",
       comorb == "diabetes" ~ "Diabetes",
+      comorb == "copd" ~ "COPD",
       comorb == "mi" ~ "Myocardial infarction"
     ),
-    value = case_when(
-      value == "0" ~ "no",
-      value == "1" ~ "yes")
+    value = case_when(value == "0" ~ "no",
+                      value == "1" ~ "yes")
   ) %>%
   group_by(comorb, value) %>%
   summarise(n = n()) %>%
+  mutate(
+    inc = n / bigN,
+    perc = n / bigN * 100,
+    plot_lab = paste0('(', n, ', ', round(perc, digits = 1), '%)')
+  ) %>%
   ggplot(aes(value, n)) +
-  geom_col(width = 0.6, alpha = 0.15, fill = "red") +
-  geom_text(aes(y=n, label = n), nudge_y = 1.5) +
+  geom_col(width = 0.6,
+           alpha = 0.15,
+           fill = "red") +
+  geom_text(aes(y = n, label = plot_lab), size = 3.5, nudge_y = 20) +
+  scale_y_continuous(limits = c(0, 400)) +
   coord_flip() +
-  facet_wrap(~ comorb) + 
+  facet_wrap( ~ comorb, ncol = 2) +
+  ggtitle("Number (and percentage) of patients\n reporting comorbidity at diagnosis") +
   ylab("Number of patients") +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major.y = element_blank(),
     axis.title.y = element_blank()
   )
-
 ```
 
 
