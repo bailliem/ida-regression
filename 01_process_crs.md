@@ -1,27 +1,25 @@
--   [Read data](#read-data)
-    -   [Set up](#set-up)
-    -   [Read data](#read-data-1)
-    -   [Check data](#check-data)
--   [Univariate data display](#univariate-data-display)
-    -   [Medical history](#medical-history)
-    -   [Patient characteristics](#patient-characteristics)
--   [Bivariate data display](#bivariate-data-display)
+  - [Read data](#read-data)
+      - [Set up](#set-up)
+      - [Read data](#read-data-1)
+      - [Check data](#check-data)
+  - [Univariate data display](#univariate-data-display)
+      - [Medical history](#medical-history)
+      - [Patient characteristics](#patient-characteristics)
+  - [Bivariate data display](#bivariate-data-display)
 
-Read data
-=========
+# Read data
 
 Assumptions:
 
--   Basic reporting
--   To aim at level 1 and 2, less emphasis on code modularity (i.e. user
+  - Basic reporting
+  - To aim at level 1 and 2, less emphasis on code modularity (i.e. user
     defined functions)
--   Code to be simple, readable, extendable.
+  - Code to be simple, readable, extendable.
 
 TODO: add variable to indicate measurement type: \* MH \* cormodoities
 \* outcome Add additional metadata on measurement timing
 
-Set up
-------
+## Set up
 
 Set up packages and path to the data set.
 
@@ -79,8 +77,7 @@ theme_set(theme_light())
 crs_data_path = here("data", "crs.Rdata")
 ```
 
-Read data
----------
+## Read data
 
 Load the CRS dataset.
 
@@ -88,8 +85,7 @@ Load the CRS dataset.
 load(crs_data_path)
 ```
 
-Check data
-----------
+## Check data
 
 Check data contents and complete any misssing information including
 labels or units.
@@ -615,14 +611,12 @@ crs %>% describe()
     ## lowest :    0    1    2   14   15, highest: 2181 2191 2229 2257 2281
     ## --------------------------------------------------------------------------------
 
-Univariate data display
-=======================
+# Univariate data display
 
-Medical history
----------------
+## Medical history
 
 A summary of medical history measured at *diagnosis* (TODO: check when
-medical history / commorbidities was assessed).
+medical history / comorbidities was assessed).
 
 ### Congestive heart failure
 
@@ -655,7 +649,7 @@ gg_chf <-
   ggplot(aes(chf)) +
   geom_bar() +
   coord_flip() +
-  ggtitle("Number of patients with congestive heart failure reported at diagnosis") +
+  ggtitle("Congesitive heart failure") +
   ylab("Number of patients") +
   theme(
     panel.grid.minor = element_blank(),
@@ -664,8 +658,98 @@ gg_chf <-
   )
 ```
 
-Patient characteristics
------------------------
+### AFib
+
+``` r
+crs %>% 
+  select(afib) %>%
+  Hmisc::describe()
+```
+
+    ## . 
+    ## 
+    ##  1  Variables      345  Observations
+    ## --------------------------------------------------------------------------------
+    ## afib : arterial fibrillation 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    341     4
+    ## Proportion 0.988 0.012
+    ## --------------------------------------------------------------------------------
+
+``` r
+gg_afib <- 
+  crs %>%
+  select(afib) %>%
+  mutate(afib = fct_recode(afib,
+                          "no" = "1",
+                          "yes"   = "0")) %>%
+  ggplot(aes(afib)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Atrial fibrillation") +
+  ylab("Number of patients") +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+### Myocardial infarction
+
+``` r
+crs %>% 
+  select(mi) %>%
+  Hmisc::describe()
+```
+
+    ## . 
+    ## 
+    ##  1  Variables      345  Observations
+    ## --------------------------------------------------------------------------------
+    ## mi : myocardio infarction 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    344     1
+    ## Proportion 0.997 0.003
+    ## --------------------------------------------------------------------------------
+
+``` r
+gg_mi <- 
+  crs %>%
+  select(mi) %>%
+  mutate(mi = fct_recode(mi,
+                          "no" = "1",
+                          "yes"   = "0")) %>%
+  ggplot(aes(mi)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Myocardial infarction") +
+  ylab("Number of patients") +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
+
+### Plot commodities
+
+Plot of the distribution of patients with specific comorbidities
+measured at diagnosis.
+
+``` r
+gg_chf + gg_afib + gg_mi
+```
+
+![](01_process_crs_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+## Patient characteristics
 
 ``` r
 gg1 <- crs %>%
@@ -676,10 +760,9 @@ gg1 <- crs %>%
 ```
 
 ``` r
-gg1 + gg1 + gg1 + gg_chf
+gg1 
 ```
 
-![](01_process_crs_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](01_process_crs_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
-Bivariate data display
-======================
+# Bivariate data display
