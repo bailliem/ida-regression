@@ -1,10 +1,21 @@
 -   [Set up](#set-up)
     -   [Read data](#read-data)
-    -   [Univariate display of data](#univariate-display-of-data)
--   [Set t](#set-t)
+-   [Univariate data display](#univariate-data-display)
+    -   [Medical history](#medical-history)
+    -   [Patient characteristics](#patient-characteristics)
+-   [Bivariate data display](#bivariate-data-display)
 
 Set up
 ======
+
+Assumptions:
+
+-   Basic reporting
+-   Code is simple, readable.
+-   Less emphasis on modularity (i.e. functions) to aim at level 1 and 2
+
+TODO: add variable to indicate measurement type: \* MH \* cormodoities
+\* outcome Add additional metadata on measurement timing
 
 Set up packages and path to the data set.
 
@@ -53,6 +64,8 @@ library(here)
     ## here() starts at C:/R/ida-regression
 
 ``` r
+library(patchwork)
+
 ## Relative path to the data set
 crs_data_path = here("data", "crs.Rdata")
 ```
@@ -66,18 +79,28 @@ Load the CRS dataset.
 load(crs_data_path)
 ```
 
-Univariate display of data
---------------------------
+Univariate data display
+=======================
+
+Medical history
+---------------
+
+Patient characteristics
+-----------------------
 
 ``` r
-crs %>%
+gg1 <- crs %>%
   ggplot(aes(y = bmi)) +
   geom_boxplot() +
   coord_flip() +
   theme_bw()
 ```
 
-![](01_process_crs_files/figure-markdown_github/unnamed-chunk-2-1.png)
+``` r
+gg1 + gg1 + gg1 
+```
 
-Set t
-=====
+![](01_process_crs_files/figure-markdown_github/unnamed-chunk-3-1.png)
+
+Bivariate data display
+======================

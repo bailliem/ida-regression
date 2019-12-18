@@ -14,7 +14,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Set up
 
+Assumptions: 
 
+* Basic reporting
+* Code is simple, readable. 
+* Less emphasis on modularity (i.e. functions) to aim at level 1 and 2
+
+
+TODO: add variable to indicate measurement type:
+* MH
+* cormodoities
+* outcome
+Add additional metadata on measurement timing
 
 Set up packages and path to the data set. 
 
@@ -24,6 +35,7 @@ library(ggplot2)
 library(dplyr)
 library(Hmisc)
 library(here)
+library(patchwork)
 
 ## Relative path to the data set
 crs_data_path = here("data", "crs.Rdata")
@@ -38,10 +50,14 @@ load(crs_data_path)
 ```
 
 
-## Univariate display of data
+# Univariate data display
+
+## Medical history
+
+## Patient characteristics 
 
 ```{r}
-crs %>%
+gg1 <- crs %>%
   ggplot(aes(y = bmi)) +
   geom_boxplot() +
   coord_flip() +
@@ -49,4 +65,9 @@ crs %>%
 ```
 
 
-# Set t
+```{r}
+gg1 + gg1 + gg1 
+```
+
+
+# Bivariate data display
