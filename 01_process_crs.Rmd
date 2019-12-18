@@ -40,6 +40,7 @@ library(Hmisc)
 library(forcats)
 library(patchwork)
 library(here)
+library(skimr)
 
 
 ## Set global ggplot theme
@@ -68,7 +69,6 @@ display the data set contents.
 Hmisc::contents(crs) 
 ```
 
-
 Add missing label for BMI. 
 
 ```{r}
@@ -89,21 +89,23 @@ crs %>% describe()
 
 A summary of medical history measured at *diagnosis* (TODO: check when medical history / comorbidities was assessed). 
 
-### Congestive heart failure
+AFib, MI and CHF. 
 
 ```{r}
 crs %>% 
-  select(chf) %>%
+  select(chf, afib, mi, diabetes) %>%
   Hmisc::describe()
 ```
 
 ```{r}
+
+## TODO: Turn this in to a function
 gg_chf <- 
   crs %>%
   select(chf) %>%
   mutate(chf = fct_recode(chf,
-                          "no" = "1",
-                          "yes"   = "0")) %>%
+                          "no" = "0",
+                          "yes"   = "1")) %>%
   ggplot(aes(chf)) +
   geom_bar() +
   coord_flip() +
@@ -117,22 +119,13 @@ gg_chf <-
 ```
 
 
-### AFib
-
-
-```{r}
-crs %>% 
-  select(afib) %>%
-  Hmisc::describe()
-```
-
 ```{r}
 gg_afib <- 
   crs %>%
   select(afib) %>%
   mutate(afib = fct_recode(afib,
-                          "no" = "1",
-                          "yes"   = "0")) %>%
+                          "no" = "0",
+                          "yes"   = "1")) %>%
   ggplot(aes(afib)) +
   geom_bar() +
   coord_flip() +
@@ -145,22 +138,14 @@ gg_afib <-
   )
 ```
 
-### Myocardial infarction
-
-
-```{r}
-crs %>% 
-  select(mi) %>%
-  Hmisc::describe()
-```
 
 ```{r}
 gg_mi <- 
   crs %>%
   select(mi) %>%
   mutate(mi = fct_recode(mi,
-                          "no" = "1",
-                          "yes"   = "0")) %>%
+                          "no" = "0",
+                          "yes"   = "1")) %>%
   ggplot(aes(mi)) +
   geom_bar() +
   coord_flip() +
@@ -173,14 +158,32 @@ gg_mi <-
   )
 ```
 
+Diabetes (type 1 and type2?)
 
+```{r}
+gg_dia <- 
+  crs %>%
+  select(diabetes) %>%
+  mutate(diabetes = fct_recode(diabetes,
+                          "no" = "0",
+                          "yes"   = "1")) %>%
+  ggplot(aes(diabetes)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Diabetes") +
+  ylab("Number of patients") +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
 
-### Plot commodities 
 
 Plot of the distribution of patients with specific comorbidities measured at diagnosis. 
 
 ```{r}
-gg_chf + gg_afib + gg_mi
+(gg_chf + gg_afib) / (gg_mi + gg_dia)
 ```
 
 

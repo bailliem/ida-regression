@@ -1,12 +1,3 @@
-  - [Read data](#read-data)
-      - [Set up](#set-up)
-      - [Read data](#read-data-1)
-      - [Check data](#check-data)
-  - [Univariate data display](#univariate-data-display)
-      - [Medical history](#medical-history)
-      - [Patient characteristics](#patient-characteristics)
-  - [Bivariate data display](#bivariate-data-display)
-
 # Read data
 
 Assumptions:
@@ -67,9 +58,12 @@ library(patchwork)
 library(here)
 ```
 
-    ## here() starts at C:/R/ida-regression
+    ## here() starts at /cloud/project
 
 ``` r
+library(skimr)
+
+
 ## Set global ggplot theme
 theme_set(theme_light())
 
@@ -463,6 +457,8 @@ crs %>% describe()
     ##      305       40       12    0.934    2.672    1.728        1        1 
     ##      .25      .50      .75      .90      .95 
     ##        2        2        3        5        6 
+    ## 
+    ## lowest :  0  1  2  3  4, highest:  7  8  9 10 12
     ##                                                                             
     ## Value          0     1     2     3     4     5     6     7     8     9    10
     ## Frequency      2    69   109    59    33     9    12     3     5     1     2
@@ -581,6 +577,8 @@ crs %>% describe()
     ##       77      268       10    0.962    3.649    2.079        1        1 
     ##      .25      .50      .75      .90      .95 
     ##        3        3        5        6        7 
+    ## 
+    ## lowest : 0 1 2 3 4, highest: 5 6 7 8 9
     ##                                                                       
     ## Value          0     1     2     3     4     5     6     7     8     9
     ## Frequency      3     6     9    22    17     8     5     4     2     1
@@ -618,17 +616,17 @@ crs %>% describe()
 A summary of medical history measured at *diagnosis* (TODO: check when
 medical history / comorbidities was assessed).
 
-### Congestive heart failure
+AFib, MI and CHF.
 
 ``` r
 crs %>% 
-  select(chf) %>%
+  select(chf, afib, mi, diabetes) %>%
   Hmisc::describe()
 ```
 
     ## . 
     ## 
-    ##  1  Variables      345  Observations
+    ##  4  Variables      345  Observations
     ## --------------------------------------------------------------------------------
     ## chf : congesitive heart failure 
     ##        n  missing distinct 
@@ -638,14 +636,39 @@ crs %>%
     ## Frequency    332    13
     ## Proportion 0.962 0.038
     ## --------------------------------------------------------------------------------
+    ## afib : arterial fibrillation 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    341     4
+    ## Proportion 0.988 0.012
+    ## --------------------------------------------------------------------------------
+    ## mi : myocardio infarction 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    344     1
+    ## Proportion 0.997 0.003
+    ## --------------------------------------------------------------------------------
+    ## diabetes 
+    ##        n  missing distinct 
+    ##      345        0        2 
+    ##                       
+    ## Value          0     1
+    ## Frequency    303    42
+    ## Proportion 0.878 0.122
+    ## --------------------------------------------------------------------------------
 
 ``` r
+## TODO: Turn this in to a function
 gg_chf <- 
   crs %>%
   select(chf) %>%
   mutate(chf = fct_recode(chf,
-                          "no" = "1",
-                          "yes"   = "0")) %>%
+                          "no" = "0",
+                          "yes"   = "1")) %>%
   ggplot(aes(chf)) +
   geom_bar() +
   coord_flip() +
@@ -658,34 +681,13 @@ gg_chf <-
   )
 ```
 
-### AFib
-
-``` r
-crs %>% 
-  select(afib) %>%
-  Hmisc::describe()
-```
-
-    ## . 
-    ## 
-    ##  1  Variables      345  Observations
-    ## --------------------------------------------------------------------------------
-    ## afib : arterial fibrillation 
-    ##        n  missing distinct 
-    ##      345        0        2 
-    ##                       
-    ## Value          0     1
-    ## Frequency    341     4
-    ## Proportion 0.988 0.012
-    ## --------------------------------------------------------------------------------
-
 ``` r
 gg_afib <- 
   crs %>%
   select(afib) %>%
   mutate(afib = fct_recode(afib,
-                          "no" = "1",
-                          "yes"   = "0")) %>%
+                          "no" = "0",
+                          "yes"   = "1")) %>%
   ggplot(aes(afib)) +
   geom_bar() +
   coord_flip() +
@@ -698,34 +700,13 @@ gg_afib <-
   )
 ```
 
-### Myocardial infarction
-
-``` r
-crs %>% 
-  select(mi) %>%
-  Hmisc::describe()
-```
-
-    ## . 
-    ## 
-    ##  1  Variables      345  Observations
-    ## --------------------------------------------------------------------------------
-    ## mi : myocardio infarction 
-    ##        n  missing distinct 
-    ##      345        0        2 
-    ##                       
-    ## Value          0     1
-    ## Frequency    344     1
-    ## Proportion 0.997 0.003
-    ## --------------------------------------------------------------------------------
-
 ``` r
 gg_mi <- 
   crs %>%
   select(mi) %>%
   mutate(mi = fct_recode(mi,
-                          "no" = "1",
-                          "yes"   = "0")) %>%
+                          "no" = "0",
+                          "yes"   = "1")) %>%
   ggplot(aes(mi)) +
   geom_bar() +
   coord_flip() +
@@ -738,16 +719,35 @@ gg_mi <-
   )
 ```
 
-### Plot commodities
+Diabetes (type 1 and type2?)
+
+``` r
+gg_dia <- 
+  crs %>%
+  select(diabetes) %>%
+  mutate(diabetes = fct_recode(diabetes,
+                          "no" = "0",
+                          "yes"   = "1")) %>%
+  ggplot(aes(diabetes)) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Diabetes") +
+  ylab("Number of patients") +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank()
+  )
+```
 
 Plot of the distribution of patients with specific comorbidities
 measured at diagnosis.
 
 ``` r
-gg_chf + gg_afib + gg_mi
+(gg_chf + gg_afib) / (gg_mi + gg_dia)
 ```
 
-![](01_process_crs_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](01_process_crs_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ## Patient characteristics
 
@@ -763,6 +763,6 @@ gg1 <- crs %>%
 gg1 
 ```
 
-![](01_process_crs_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](01_process_crs_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 # Bivariate data display
