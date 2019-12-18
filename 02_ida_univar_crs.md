@@ -207,7 +207,7 @@ crs %>%
            alpha = 0.15,
            fill = "red") +
   coord_flip() +
-  facet_wrap( ~ comorb, ncol = 1, scales = "free_y") +
+  facet_wrap( ~ comorb, ncol = 2, scales = "free_y") +
     ggtitle("Number and percentage of patients reporting\n a comorbidity at diagnosis") +
   theme_minimal(base_size = 12) +
   theme(
