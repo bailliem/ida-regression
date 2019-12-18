@@ -1,30 +1,18 @@
+-   [About](#about)
+-   [Set up](#set-up)
 -   [Read data](#read-data)
-    -   [Set up](#set-up)
-    -   [Read data](#read-data-1)
-    -   [Check data](#check-data)
--   [Descriptive summary](#descriptive-summary)
-    -   [Medical history](#medical-history)
-    -   [Patient characteristics](#patient-characteristics)
--   [Bivariate data display](#bivariate-data-display)
+-   [Check data](#check-data)
+-   [Save data sets](#save-data-sets)
+-   [Session info](#session-info)
 
-Read data
-=========
+About
+=====
 
-Assumptions:
-
--   Basic reporting
--   To aim at level 1 and 2, less emphasis on code modularity (i.e. user
-    defined functions)
--   Code to be simple, readable, extendable.
-
-TODO:add variable to indicate measurement type:
-
--   med history
--   outcome
--   Add additional metadata on measurement schedule
+This notebook is for final processing of data prior to IDA
+e.g. completing missing meta-data, labels, etc.
 
 Set up
-------
+======
 
 Set up packages and path to the data set.
 
@@ -73,25 +61,23 @@ library(here)
 
     ## here() starts at /cloud/project
 
-``` r
-## Set global ggplot theme
-theme_set(theme_light(base_size = 12))
-
-## Relative path to the data set
-crs_data_path = here("data", "crs.Rdata")
-```
-
 Read data
----------
+=========
+
+TODO:add variable to indicate measurement type:
+
+-   med history
+-   outcome
+-   Add additional metadata on measurement schedule
 
 Load the CRS dataset.
 
 ``` r
-load(crs_data_path)
+load(here("data","crs.Rdata"))
 ```
 
 Check data
-----------
+==========
 
 Check data contents and complete any misssing information including
 labels or units.
@@ -243,125 +229,66 @@ Hmisc::contents(crs)
 Add missing label for BMI.
 
 ``` r
-crs <- crs %>%
+a_crs <- crs %>%
   Hmisc::upData(labels = c(bmi = 'body mass index'))
 ```
 
     ## Input object size:    124504 bytes;   44 variables    345 observations
     ## New object size: 123656 bytes;   44 variables    345 observations
 
-Descriptive summary
-===================
+Save data sets
+==============
 
-Univariate analyses.
-
-Medical history
----------------
-
-A summary of medical history measured at *diagnosis* (TODO: check when
-medical history / comorbidities were assessed): \* AFib, \* MI \* CHF \*
-Diabetes
-
-Print out descriptive summary.
+Save the updated data set.
 
 ``` r
-crs %>% 
-  select(chf, afib, mi, diabetes) %>%
-  Hmisc::describe()
+save(crs, a_crs, file = here("data","a_crs.Rdata"))
 ```
 
-    ## . 
+Session info
+============
+
+``` r
+sessionInfo()
+```
+
+    ## R version 3.6.0 (2019-04-26)
+    ## Platform: x86_64-pc-linux-gnu (64-bit)
+    ## Running under: Ubuntu 16.04.6 LTS
     ## 
-    ##  4  Variables      345  Observations
-    ## --------------------------------------------------------------------------------
-    ## chf : congesitive heart failure 
-    ##        n  missing distinct 
-    ##      345        0        2 
-    ##                       
-    ## Value          0     1
-    ## Frequency    332    13
-    ## Proportion 0.962 0.038
-    ## --------------------------------------------------------------------------------
-    ## afib : arterial fibrillation 
-    ##        n  missing distinct 
-    ##      345        0        2 
-    ##                       
-    ## Value          0     1
-    ## Frequency    341     4
-    ## Proportion 0.988 0.012
-    ## --------------------------------------------------------------------------------
-    ## mi : myocardio infarction 
-    ##        n  missing distinct 
-    ##      345        0        2 
-    ##                       
-    ## Value          0     1
-    ## Frequency    344     1
-    ## Proportion 0.997 0.003
-    ## --------------------------------------------------------------------------------
-    ## diabetes 
-    ##        n  missing distinct 
-    ##      345        0        2 
-    ##                       
-    ## Value          0     1
-    ## Frequency    303    42
-    ## Proportion 0.878 0.122
-    ## --------------------------------------------------------------------------------
-
-Plot of the distribution of patients with specific comorbidities
-measured at diagnosis.
-
-Process steps: \* Select comorbidities \* Transform data frame from wide
-to long \* Transform and spell out factors for plotting \* Plot counts
-by comorbidity
-
-``` r
-bigN <- nrow(crs)
-crs %>%
-  select(id, chf, afib, diabetes, mi, copd) %>%
-  pivot_longer(-id, names_to = "comorb", values_to = "value") %>%
-  mutate(
-    comorb = case_when(
-      comorb == "chf" ~ "Congestive heart failure",
-      comorb == "afib" ~ "Atrial fibrillation",
-      comorb == "diabetes" ~ "Diabetes",
-      comorb == "copd" ~ "COPD",
-      comorb == "mi" ~ "Myocardial infarction"
-    ),
-    value = case_when(value == "0" ~ "no",
-                      value == "1" ~ "yes")
-  ) %>%
-  group_by(comorb, value) %>%
-  summarise(n = n()) %>%
-  mutate(
-    inc = n / bigN,
-    perc = n / bigN * 100,
-    plot_lab = paste0('(', n, ', ', round(perc, digits = 1), '%)')
-  ) %>%
-  ggplot(aes(value, n)) +
-  geom_col(width = 0.6,
-           alpha = 0.15,
-           fill = "red") +
-  geom_text(aes(y = n, label = plot_lab), size = 3.5, nudge_y = 20) +
-  scale_y_continuous(limits = c(0, 400)) +
-  coord_flip() +
-  facet_wrap( ~ comorb, ncol = 2) +
-  ggtitle("Number (and percentage) of patients\n reporting comorbidity at diagnosis") +
-  ylab("Number of patients") +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.y = element_blank(),
-    axis.title.y = element_blank()
-  )
-```
-
-![](01_process_crs_files/figure-markdown_github/unnamed-chunk-5-1.png)
-
-Patient characteristics
------------------------
-
-TODO
-
-Bivariate data display
-======================
-
-TODO
+    ## Matrix products: default
+    ## BLAS:   /usr/lib/atlas-base/atlas/libblas.so.3.0
+    ## LAPACK: /usr/lib/atlas-base/atlas/liblapack.so.3.0
+    ## 
+    ## locale:
+    ##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
+    ##  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8   
+    ##  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C          
+    ## [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+    ## 
+    ## attached base packages:
+    ## [1] stats     graphics  grDevices utils     datasets  methods   base     
+    ## 
+    ## other attached packages:
+    ## [1] here_0.1          Hmisc_4.3-0       Formula_1.2-3     survival_2.44-1.1
+    ## [5] lattice_0.20-38   tidyr_1.0.0       dplyr_0.8.3       ggplot2_3.2.1    
+    ## [9] rmarkdown_2.0    
+    ## 
+    ## loaded via a namespace (and not attached):
+    ##  [1] tidyselect_0.2.5    xfun_0.11           purrr_0.3.3        
+    ##  [4] splines_3.6.0       colorspace_1.4-1    vctrs_0.2.1        
+    ##  [7] htmltools_0.4.0     yaml_2.2.0          base64enc_0.1-3    
+    ## [10] rlang_0.4.2         pillar_1.4.2        foreign_0.8-71     
+    ## [13] glue_1.3.1          withr_2.1.2         RColorBrewer_1.1-2 
+    ## [16] lifecycle_0.1.0     stringr_1.4.0       munsell_0.5.0      
+    ## [19] gtable_0.3.0        htmlwidgets_1.5.1   evaluate_0.14      
+    ## [22] latticeExtra_0.6-28 knitr_1.26          htmlTable_1.13.3   
+    ## [25] Rcpp_1.0.3          acepack_1.4.1       backports_1.1.5    
+    ## [28] scales_1.1.0        checkmate_1.9.4     gridExtra_2.3      
+    ## [31] digest_0.6.23       stringi_1.4.3       rprojroot_1.3-2    
+    ## [34] grid_3.6.0          tools_3.6.0         magrittr_1.5       
+    ## [37] lazyeval_0.2.2      tibble_2.1.3        cluster_2.0.8      
+    ## [40] crayon_1.3.4        pkgconfig_2.0.3     zeallot_0.1.0      
+    ## [43] Matrix_1.2-17       data.table_1.12.8   assertthat_0.2.1   
+    ## [46] rstudioapi_0.10     R6_2.4.1            rpart_4.1-15       
+    ## [49] nnet_7.3-12         compiler_3.6.0
