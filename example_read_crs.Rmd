@@ -7,93 +7,53 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## GitHub Documents
+## Set up
 
-This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+Set up packages and path to the data set. 
 
 ```{r setupR}
 library(ggplot2)
 library(dplyr)
-library(readr)
 library(Hmisc)
-library(skimr)
 library(here)
 
 ## Relative path to the data set
-crs_data_path = here("data", "crs.csv")
+crs_data_path = here("data", "crs.Rdata")
 ```
 
+## Read data
 
 Load the CRS dataset.
 
 ```{r}
-crs_data = read_csv(crs_data_path)
+load(crs_data_path)
 ```
 
-```{r}
-crs_data %>% glimpse()
-```
-
-
-
+Glimpse at the structure of the data set. 
 
 ```{r}
-crs_data %>% 
-  ggplot(aes(x = t2comp_pre, y = bmi)) + 
-  geom_point()
+crs %>% 
+  glimpse() 
 ```
 
 
-Examine the the contents of the data set.
+## Print contents
+
+
+display the data set contents. 
 
 ```{r}
-Hmisc::describe(crs_data) 
-```
-
-```{r}
-sum <- Hmisc::describe(crs_data) 
-sum %>% glimpse()
+Hmisc::contents(crs) 
 ```
 
 
 
-```{r}
-skim(crs_data)
-```
+## Describe data
+
+Print a description of the data set.
 
 ```{r}
-skim(crs_data) 
-```
-
-
-```{r}
-set.seed(22)
-data <- data.frame(age = floor(rnorm(6,25,10)), 
-                   sex = gl(2,1,6, labels = c("f","m")))
-var.labels <- c(age = "Age in Years", 
-                sex = "Sex of the participant")
-dplyr::as.tbl(data) # as tibble ---------------------------------------------
-#> # A tibble: 6 × 2
-#>     age    sex
-#>   <dbl> <fctr>
-#> 1    19      f
-#> 2    49      m
-#> 3    35      f
-#> 4    27      m
-#> 5    22      f
-#> 6    43      m
-data <- Hmisc::upData(data, labels = var.labels) # update data --------------
-#> Input object size:    1328 bytes;     2 variables     6 observations
-#> New object size: 2096 bytes; 2 variables 6 observations
-Hmisc::label(data) # check new labels ---------------------------------------
-#>                      age                      sex 
-#>           "Age in Years" "Sex of the participant"
-Hmisc::contents(data) # data dictionary -------------------------------------
-```
-
-
-```{r}
-skim(crs_data)
+Hmisc::describe(crs) 
 ```
 
 
