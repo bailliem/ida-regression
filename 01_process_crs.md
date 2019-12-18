@@ -75,7 +75,7 @@ library(here)
 
 ``` r
 ## Set global ggplot theme
-theme_set(theme_light(base_size = 10))
+theme_set(theme_light(base_size = 12))
 
 ## Relative path to the data set
 crs_data_path = here("data", "crs.Rdata")
@@ -310,6 +310,10 @@ crs %>%
 Plot of the distribution of patients with specific comorbidities
 measured at diagnosis.
 
+Process steps: \* Select comorbidities \* Transform data frame from wide
+to long \* Transform and spell out factors for plotting \* Plot counts
+by comorbidity
+
 ``` r
 crs %>%
   select(id, chf, afib, diabetes, mi) %>%
@@ -320,13 +324,16 @@ crs %>%
       comorb == "afib" ~ "Atrial fibrillation",
       comorb == "diabetes" ~ "Diabetes",
       comorb == "mi" ~ "Myocardial infarction"
-      ),
+    ),
     value = case_when(
       value == "0" ~ "no",
       value == "1" ~ "yes")
-    ) %>%
-  ggplot(aes(value)) +
-  geom_bar() +
+  ) %>%
+  group_by(comorb, value) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(value, n)) +
+  geom_col(width = 0.6, alpha = 0.15, fill = "red") +
+  geom_text(aes(y=n, label = n), nudge_y = 1.5) +
   coord_flip() +
   facet_wrap(~ comorb) + 
   ylab("Number of patients") +
@@ -342,19 +349,9 @@ crs %>%
 Patient characteristics
 -----------------------
 
-``` r
-gg1 <- crs %>%
-  ggplot(aes(y = bmi)) +
-  geom_boxplot() +
-  coord_flip() +
-  theme_bw()
-```
-
-``` r
-gg1 
-```
-
-![](01_process_crs_files/figure-markdown_github/unnamed-chunk-7-1.png)
+TODO
 
 Bivariate data display
 ======================
+
+TODO
