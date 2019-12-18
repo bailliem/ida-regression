@@ -1,0 +1,52 @@
+---
+title: "Process the CRS data set"
+output:
+  md_document:
+    variant: markdown_github
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Set up
+
+
+
+Set up packages and path to the data set. 
+
+```{r setupR}
+library(rmarkdown)
+library(ggplot2)
+library(dplyr)
+library(Hmisc)
+library(here)
+
+## Relative path to the data set
+crs_data_path = here("data", "crs.Rdata")
+```
+
+## Read data
+
+Load the CRS dataset.
+
+```{r}
+load(crs_data_path)
+```
+
+
+## Univariate display of data
+
+```{r}
+crs %>%
+  ggplot(aes(y = bmi)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw()
+```
+
+
+# Set t
