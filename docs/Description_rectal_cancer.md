@@ -22,9 +22,9 @@ Possible actions:
 -	Combine preop chemo+radiation as preop trt*
 
 
-**Source:** Mayo Clinic data courtesy of Dr. David Larson. [LINK](https://github.com/stratos-ida/ida-regression/data/crs.csv)
+**Source:** Mayo Clinic data courtesy of Dr. David Larson. [LINK](https://github.com/stratos-ida/ida-regression/blob/master/data/crs.csv)
 
-**Data dictionary:**  [LINK](https://github.com/stratos-ida/ida-regression/docs/crs.html)
+**Data dictionary:**  [LINK](https://github.com/stratos-ida/ida-regression/blob/master/docs/crs.html)
 
 **References:**
 * Khreiss W, Huebner M, Cima R, Dozois E, Chua H, Pemberton JH, Harmson W,  Larson DW. Improving Conventional Recovery With Enhanced Recovery in Minimally Invasive Surgery for Rectal Cancer. Diseases of the Colon & Rectum 57 (5), 557-563
