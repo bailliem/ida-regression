@@ -203,6 +203,49 @@ crs %>%
 
 ![](02_ida_univar_crs_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
+``` r
+crs %>%
+  select(id, chf, afib, diabetes, mi, copd, crohn, ulcercol, ibd) %>%
+  pivot_longer(-id, names_to = "comorb", values_to = "value") %>%
+  mutate(
+    comorb = case_when(
+      comorb == "chf" ~ "Congestive heart failure",
+      comorb == "afib" ~ "Atrial fibrillation",
+      comorb == "diabetes" ~ "Diabetes",
+      comorb == "copd" ~ "COPD",
+      comorb == "mi" ~ "Myocardial infarction",
+      comorb == "crohn" ~ "Crohn's disease",
+      comorb == "ulcercol" ~ "Ulcerative colitis",
+      comorb == "ibd" ~ "Inflammatory bowel disease"
+    ),
+    value = case_when(value == "0" ~ "no",
+                      value == "1" ~ "yes")
+  ) %>%
+  group_by(comorb, value) %>%
+  summarise(n = n()) %>%
+  mutate(
+    inc = n / bigN,
+    perc = n / bigN * 100,
+    plot_lab = paste0('(', n, ', ', round(perc, digits = 1), '%)'),
+    axis_lab = paste0(comorb, ' ', '(', n, ', ', round(perc, digits = 1), '%)')
+  ) %>%
+  filter(value == "yes") %>%
+  ggplot(aes(reorder(axis_lab, inc), inc)) +
+  geom_col(width = 0.6,
+           alpha = 0.15,
+           fill = "black") +
+  coord_flip() +
+  ggtitle("Proportion of patients reporting a comorbidity at diagnosis") +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title = element_blank()
+  )
+```
+
+![](02_ida_univar_crs_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
 Patient characteristics
 -----------------------
 
@@ -243,16 +286,16 @@ sessionInfo()
     ##  [7] htmltools_0.4.0     yaml_2.2.0          base64enc_0.1-3    
     ## [10] rlang_0.4.2         pillar_1.4.2        foreign_0.8-71     
     ## [13] glue_1.3.1          withr_2.1.2         RColorBrewer_1.1-2 
-    ## [16] lifecycle_0.1.0     stringr_1.4.0       munsell_0.5.0      
-    ## [19] gtable_0.3.0        htmlwidgets_1.5.1   evaluate_0.14      
-    ## [22] labeling_0.3        latticeExtra_0.6-28 knitr_1.26         
-    ## [25] htmlTable_1.13.3    Rcpp_1.0.3          acepack_1.4.1      
-    ## [28] backports_1.1.5     scales_1.1.0        checkmate_1.9.4    
-    ## [31] farver_2.0.1        gridExtra_2.3       digest_0.6.23      
-    ## [34] stringi_1.4.3       rprojroot_1.3-2     grid_3.6.0         
-    ## [37] tools_3.6.0         magrittr_1.5        lazyeval_0.2.2     
-    ## [40] tibble_2.1.3        cluster_2.0.8       crayon_1.3.4       
-    ## [43] pkgconfig_2.0.3     zeallot_0.1.0       Matrix_1.2-17      
-    ## [46] data.table_1.12.8   assertthat_0.2.1    rstudioapi_0.10    
-    ## [49] R6_2.4.1            rpart_4.1-15        nnet_7.3-12        
-    ## [52] compiler_3.6.0
+    ## [16] jpeg_0.1-8.1        lifecycle_0.1.0     stringr_1.4.0      
+    ## [19] munsell_0.5.0       gtable_0.3.0        htmlwidgets_1.5.1  
+    ## [22] evaluate_0.14       labeling_0.3        latticeExtra_0.6-29
+    ## [25] knitr_1.26          htmlTable_1.13.3    Rcpp_1.0.3         
+    ## [28] acepack_1.4.1       backports_1.1.5     scales_1.1.0       
+    ## [31] checkmate_1.9.4     farver_2.0.1        gridExtra_2.3      
+    ## [34] png_0.1-7           digest_0.6.23       stringi_1.4.3      
+    ## [37] rprojroot_1.3-2     grid_3.6.0          tools_3.6.0        
+    ## [40] magrittr_1.5        lazyeval_0.2.2      tibble_2.1.3       
+    ## [43] cluster_2.0.8       crayon_1.3.4        pkgconfig_2.0.3    
+    ## [46] zeallot_0.1.0       Matrix_1.2-17       data.table_1.12.8  
+    ## [49] assertthat_0.2.1    rstudioapi_0.10     R6_2.4.1           
+    ## [52] rpart_4.1-15        nnet_7.3-12         compiler_3.6.0
