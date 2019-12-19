@@ -1,6 +1,6 @@
-Rectal cancer surgery dataset 
+# Rectal cancer surgery dataset 
 
-Description: The data sets includes 345 patients undergoing minimally invasive resection for rectal cancer 
+**Description:** The data sets includes 345 patients undergoing minimally invasive resection for rectal cancer 
 from 2005 to 2011. The 44 variables describe patient characteristics (age, bmi, current smoker, 
 ASA, prior abdominal surgery), surgical and treatment variables (primary procedure, preop chemo, preop radiation), post-surgical complications (ileus, wound infection, death30, readmission30, ), and comorbidities (COPD, diabetes), and time to complications and time to follow-up. Complications include post-operative ileus, abscess, leak, wound infection, small bowel obstruction, reoperation for bleeding, and renal failure. 
 
