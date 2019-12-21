@@ -152,6 +152,49 @@ crs %>%
 ```
 
 
+
+
+
+
+```{r}
+crs %>%
+  select(id, chf, afib, diabetes, mi, copd, crohn, ulcercol, ibd) %>%
+  pivot_longer(-id, names_to = "comorb", values_to = "value") %>%
+  mutate(
+    comorb = case_when(
+      comorb == "chf" ~ "Congestive heart failure",
+      comorb == "afib" ~ "Atrial fibrillation",
+      comorb == "diabetes" ~ "Diabetes",
+      comorb == "copd" ~ "COPD",
+      comorb == "mi" ~ "Myocardial infarction",
+      comorb == "crohn" ~ "Crohn's disease",
+      comorb == "ulcercol" ~ "Ulcerative colitis",
+      comorb == "ibd" ~ "Inflammatory bowel disease"
+    ),
+    value = case_when(value == "0" ~ "no",
+                      value == "1" ~ "yes")
+  ) %>%
+  group_by(comorb, value) %>%
+  summarise(n = n()) %>%
+  mutate(
+    inc = n / bigN,
+    perc = n / bigN * 100,
+    plot_lab = paste0('(', n, ', ', round(perc, digits = 1), '%)'),
+    axis_lab = paste0(comorb, ' ', '(', n, ', ', round(perc, digits = 1), '%)')
+  ) %>%
+  filter(value == "yes") %>%
+  ggplot(aes(reorder(axis_lab, inc), inc)) +
+  geom_point() +
+  coord_flip() +
+  ggtitle("Proportion of patients reporting a comorbidity at diagnosis") +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.title = element_blank()
+  )
+```
+
 ## Patient characteristics 
 
 TODO
